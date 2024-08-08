@@ -1,0 +1,55 @@
+-- Exercise 4: Functions
+
+-- Scenario 1: Calculate the age of customers for eligibility checks.
+-- o	Question: Write a function CalculateAge that takes a customer's date of birth as input and returns their age in years.
+
+CREATE OR REPLACE FUNCTION CalculateAge(cust_dob IN DATE)
+RETURN NUMBER
+IS
+    cust_age NUMBER(3,0);
+BEGIN
+    cust_age := (SYSDATE - cust_dob) / 365;
+    RETURN cust_age;
+END;
+/
+
+
+-- Scenario 2: The bank needs to compute the monthly installment for a loan.
+-- o	Question: Write a function CalculateMonthlyInstallment that takes the loan amount, interest rate, and loan duration in years as input and returns the monthly installment amount.
+
+CREATE OR REPLACE FUNCTION CalculateMonthlyInstallment (
+    loan_amount NUMBER,
+    interest_rate NUMBER,
+    loan_duration NUMBER
+)
+RETURN NUMBER
+IS
+    monthly_interest NUMBER;
+    monthly_install NUMBER;
+BEGIN
+    monthly_interest := interest_rate / 1200; 
+    monthly_install := (loan_amount*monthly_interest*POWER(1+monthly_interest,loan_duration*12)) / (POWER(1+monthly_interest,loan_duration * 12) - 1);
+    RETURN monthly_install;
+END;
+/
+
+
+-- Scenario 3: Check if a customer has sufficient balance before making a transaction.
+-- o	Question: Write a function HasSufficientBalance that takes an account ID and an amount as input and returns a boolean indicating whether the account has at least the specified amount.
+
+CREATE OR REPLACE FUNCTION HasSufficientBalance (
+   account_id IN NUMBER, amount IN NUMBER
+)
+RETURN BOOLEAN
+IS
+    f_balance NUMBER;
+BEGIN
+    SELECT balance INTO f_balance FROM accounts where accountid = account_id;
+    IF f_balance >= amount THEN
+	    RETURN TRUE;
+    ELSE
+	    RETURN FALSE;
+    END IF;
+END;
+/
+

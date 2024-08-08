@@ -1,0 +1,75 @@
+-- Exercise 2: Error Handling
+
+-- Scenario 1: Handle exceptions during fund transfers between accounts.
+-- o	Question: Write a stored procedure SafeTransferFunds that transfers funds between two accounts. Ensure that if any error occurs (e.g., insufficient funds), an appropriate error message is logged and the transaction is rolled back.
+CREATE OR REPLACE PROCEDURE SafeTransferFunds(acc1 NUMBER, acc2 NUMBER, amt NUMBER)
+IS
+    amt_insufficient EXCEPTION;
+    acc_not_found EXCEPTION;
+    bal NUMBER;
+BEGIN
+    SELECT balance INTO bal
+    FROM accounts
+    WHERE accountid = acc1;
+    IF bal < amt THEN
+        RAISE amt_insufficient;
+    ELSE 
+        UPDATE accounts SET balance = balance + amt 
+        WHERE accountid = acc2;
+        IF SQL%NOTFOUND THEN
+            RAISE acc_not_found;
+        END IF;
+        UPDATE accounts SET balance = balance - amt 
+        WHERE accountid = acc1;
+    END IF;
+
+EXCEPTION
+    WHEN acc_not_found THEN
+        DBMS_OUTPUT.PUT_LINE('Account no. '|| acc2 || ' not found.');
+    WHEN amt_insufficient THEN
+        DBMS_OUTPUT.PUT_LINE('Account does not have enough balance.');
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Account no. '|| acc1 || ' not found.');
+END;
+/
+        
+
+
+
+-- Scenario 2: Manage errors when updating employee salaries.
+-- o	Question: Write a stored procedure UpdateSalary that increases the salary of an employee by a given percentage. If the employee ID does not exist, handle the exception and log an error message.
+
+CREATE OR REPLACE PROCEDURE UpdateSalary(emp_no NUMBER, percent NUMBER)
+IS
+    emp_not_found EXCEPTION;
+BEGIN
+    UPDATE employees SET salary = salary * (1+(percent/100))
+    WHERE employeeid = emp_no;
+    IF SQL%NOTFOUND THEN
+        RAISE emp_not_found;
+    END IF;
+
+EXCEPTION
+    WHEN emp_not_found THEN
+        DBMS_OUTPUT.PUT_LINE('EmployeeID '|| emp_no || ' not found.');
+END;
+/
+
+
+
+-- Scenario 3: Ensure data integrity when adding a new customer.
+-- o	Question: Write a stored procedure AddNewCustomer that inserts a new customer into the Customers table. If a customer with the same ID already exists, handle the exception by logging an error and preventing the insertion.
+
+CREATE OR REPLACE PROCEDURE AddNewCustomer(cust_id NUMBER, c_name VARCHAR2,c_dob DATE, c_bal NUMBER, c_lm DATE)
+IS
+    cust_exists EXCEPTION;
+    PRAGMA EXCEPTION_INIT(cust_exists, -00001);
+BEGIN
+    INSERT INTO customers VALUES(cust_id, c_name,c_dob, c_bal, c_lm);
+
+EXCEPTION
+    WHEN cust_exists THEN
+        DBMS_OUTPUT.PUT_LINE('CustomerID '|| cust_id || ' already exists in table.');
+END;
+/
+

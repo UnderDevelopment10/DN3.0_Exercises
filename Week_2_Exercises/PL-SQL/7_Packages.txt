@@ -1,0 +1,34 @@
+-- Exercise 7: Packages
+
+-- Scenario 1: Group all customer-related procedures and functions into a package.
+-- o	Question: Create a package CustomerManagement with procedures for adding a new customer, updating customer details, and a function to get customer balance.
+
+CREATE OR REPLACE PACKAGE CustomerManagement AS
+    PROCEDURE AddCustomer(p_CustomerID IN NUMBER, p_Name IN VARCHAR2, p_DOB IN DATE, p_Balance IN NUMBER);
+    PROCEDURE UpdateCustomer(p_CustomerID IN NUMBER, p_Name IN VARCHAR2, p_DOB IN DATE, p_Balance IN NUMBER);
+    FUNCTION GetCustomerBalance(p_CustomerID IN NUMBER) RETURN NUMBER;
+END CustomerManagement;
+/
+
+
+-- Scenario 2: Create a package to manage employee data.
+-- o	Question: Write a package EmployeeManagement with procedures to hire new employees, update employee details, and a function to calculate annual salary.
+
+CREATE OR REPLACE PACKAGE EmployeeManagement AS
+    PROCEDURE HireEmployee(p_EmployeeID IN NUMBER, p_Name IN VARCHAR2, p_Position IN VARCHAR2, p_Salary IN NUMBER, p_Department IN VARCHAR2);
+    PROCEDURE UpdateEmployee(p_EmployeeID IN NUMBER, p_Name IN VARCHAR2, p_Position IN VARCHAR2, p_Salary IN NUMBER, p_Department IN VARCHAR2);
+   FUNCTION CalculateAnnualSalary(p_EmployeeID IN NUMBER) RETURN NUMBER;
+END EmployeeManagement;
+/
+
+
+-- Scenario 3: Group all account-related operations into a package.
+-- o	Question: Create a package AccountOperations with procedures for opening a new account, closing an account, and a function to get the total balance of a customer across all accounts.
+
+CREATE OR REPLACE PACKAGE AccountOperations AS
+    PROCEDURE OpenAccount(p_AccountID IN NUMBER, p_CustomerID IN NUMBER, p_AccountType IN VARCHAR2, p_Balance IN NUMBER);
+    PROCEDURE CloseAccount(p_AccountID IN NUMBER);
+    FUNCTION GetTotalBalance(p_CustomerID IN NUMBER) RETURN NUMBER;
+END AccountOperations;
+/
+

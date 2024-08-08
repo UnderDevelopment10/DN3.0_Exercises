@@ -1,0 +1,86 @@
+-- Exercise 6: Cursors
+
+-- Scenario 1: Generate monthly statements for all customers.
+-- o	Question: Write a PL/SQL block using an explicit cursor GenerateMonthlyStatements that retrieves all transactions for the current month and prints a statement for each customer.
+
+DECLARE
+    CURSOR c06 IS
+        SELECT c.CustomerID, c.Name, t.TransactionDate, t.Amount 
+        FROM Transactions t JOIN Accounts a ON t.AccountID = a.AccountID
+        JOIN Customers c ON a.CustomerID = c.CustomerID WHERE t.TransactionDate BETWEEN TRUNC(SYSDATE, 'MM') AND LAST_DAY(SYSDATE) ORDER BY c.CustomerID, t.TransactionDate;
+    v_CustomerID Customers.CustomerID%TYPE := NULL;
+    v_Name Customers.Name%TYPE;
+    v_TransactionDate Transactions.TransactionDate%TYPE;
+    v_Amount Transactions.Amount%TYPE;
+    v_TotalAmount NUMBER := 0;
+BEGIN
+    OPEN c06;
+    LOOP
+        FETCH c06 INTO v_CustomerID, v_Name, v_TransactionDate, v_Amount;
+        EXIT WHEN c06%NOTFOUND;
+           IF v_CustomerID IS NOT NULL THEN
+            IF v_CustomerID != NVL(v_CustomerID, v_CustomerID) THEN
+                DBMS_OUTPUT.PUT_LINE('Monthly Statement for Customer ID: ' || v_CustomerID || ', Name: ' || v_Name);
+                v_TotalAmount := 0;
+            END IF;
+        END IF;
+        DBMS_OUTPUT.PUT_LINE('Date: ' || TO_CHAR(v_TransactionDate, 'YYYY-MM-DD') || ', Amount: ' || v_Amount);
+        v_TotalAmount := v_TotalAmount + v_Amount;
+        IF c06%NOTFOUND OR v_CustomerID != NVL(v_CustomerID, v_CustomerID) THEN
+            DBMS_OUTPUT.PUT_LINE('Total Amount: ' || v_TotalAmount);
+            DBMS_OUTPUT.PUT_LINE('');
+        END IF;       
+    END LOOP;
+    CLOSE c06;
+END;
+/
+
+
+
+-- Scenario 2: Apply annual fee to all accounts.
+-- o	Question: Write a PL/SQL block using an explicit cursor ApplyAnnualFee that deducts an annual maintenance fee from the balance of all accounts.
+
+
+DECLARE
+    CURSOR c06b IS SELECT AccountID, Balance FROM Accounts;
+    v_AccountID Accounts.AccountID%TYPE;
+    v_Balance Accounts.Balance%TYPE;
+    v_AnnualFee NUMBER := 100; 
+BEGIN
+    OPEN c06b;
+    LOOP
+        FETCH c06b INTO v_AccountID, v_Balance;
+        EXIT WHEN c06b%NOTFOUND;
+        UPDATE Accounts
+        SET Balance = v_Balance - v_AnnualFee
+        WHERE AccountID = v_AccountID;
+        END LOOP;
+    CLOSE c06b;
+    COMMIT; 
+END;
+/
+
+
+
+-- Scenario 3: Update the interest rate for all loans based on a new policy.
+-- o	Question: Write a PL/SQL block using an explicit cursor UpdateLoanInterestRates that fetches all loans and updates their interest rates based on the new policy.
+
+DECLARE
+    CURSOR c_loans IS SELECT LoanID, InterestRate FROM Loans;
+    v_LoanID Loans.LoanID%TYPE;
+    v_OldInterestRate Loans.InterestRate%TYPE;
+    v_NewInterestRate Loans.InterestRate%TYPE;
+    v_NewInterestRatePolicy NUMBER := 10; 
+BEGIN
+    OPEN c_loans;
+    LOOP
+        FETCH c_loans INTO v_LoanID, v_OldInterestRate;
+        EXIT WHEN c_loans%NOTFOUND;
+        UPDATE Loans
+        SET InterestRate = v_NewInterestRatePolicy
+        WHERE LoanID = v_LoanID;
+    END LOOP;
+    CLOSE c_loans;
+    COMMIT;
+ END;
+/

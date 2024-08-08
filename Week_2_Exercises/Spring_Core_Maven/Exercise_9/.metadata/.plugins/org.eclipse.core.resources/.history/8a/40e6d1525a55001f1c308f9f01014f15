@@ -1,0 +1,34 @@
+package com.library.api.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.library.api.entity.Book;
+import com.library.api.repository.BookRepository;
+
+@RestController
+@RequestMapping("/api/books")
+public class BookController {
+	@Autowired
+	BookRepository bookrepository;
+	
+	@GetMapping("/test")
+	public String test() {
+		return "Welcome to Book API!";
+	}
+	
+	// route map for adding the new book
+	@PostMapping("/add")
+	public String addBook(@RequestBody Book book) {
+		//calling the repository method save
+		// if id=0 then create new record
+		/// if   >0 update the record
+		return bookRepository.save(book);
+	}
+	
+	
+}

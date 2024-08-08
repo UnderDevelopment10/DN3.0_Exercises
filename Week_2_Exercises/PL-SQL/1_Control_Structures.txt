@@ -1,0 +1,62 @@
+-- Exercise 1: Control Structures
+
+-- Scenario 1: The bank wants to apply a discount to loan interest rates for customers above 60 years old.
+-- o	Question: Write a PL/SQL block that loops through all customers, checks their age, and if they are above 60, apply a 1% discount to their current loan interest rates.
+
+DECLARE
+    CURSOR cust_cursor IS SELECT customerId  FROM customers JOIN loans USING(customerId) WHERE SYSDATE - customers.dob > 60*365;
+    cust customers.customerId%TYPE;
+BEGIN
+    OPEN cust_cursor;
+    LOOP
+        FETCH cust_cursor INTO cust;
+        DBMS_OUTPUT.PUT_LINE(cust);
+        SELECT 
+
+        EXIT WHEN cust_cursor%NOTFOUND;
+    END LOOP;
+    CLOSE cust_cursor;
+END;
+/
+
+
+-- Scenario 2: A customer can be promoted to VIP status based on their balance.
+-- o	Question: Write a PL/SQL block that iterates through all customers and sets a flag IsVIP to TRUE for those with a balance over $10,000.
+
+
+ALTER TABLE customers ADD isVIP CHAR(1);
+
+DECLARE
+    CURSOR cust_cursor IS 
+    SELECT customerid, balance FROM customers;
+BEGIN
+    FOR cust IN cust_cursor
+    LOOP
+        IF cust.balance > 10000 THEN
+            UPDATE customers SET isVIP = 'T'
+            WHERE customerid = cust.customerid;
+        ELSE 
+            UPDATE customers SET isVIP = 'F'
+            WHERE customerid = cust.customerid;
+        END IF;
+    END LOOP;
+END;
+/
+
+-- Scenario 3: The bank wants to send reminders to customers whose loans are due within the next 30 days.
+-- o	Question: Write a PL/SQL block that fetches all loans due in the next 30 days and prints a reminder message for each customer.
+
+DECLARE
+    CURSOR loan_cursor IS
+        SELECT loanid, c.customerid, enddate 
+        FROM loans l JOIN customers c ON l.customerid = c.customerid
+        WHERE l.enddate BETWEEN SYSDATE AND SYSDATE+30;
+
+BEGIN
+    FOR loan in loan_cursor
+    LOOP
+        DBMS_OUTPUT.PUT_LINE('For CustomerId: '||loan.customerid||', Loan with Id: '||loan.loanid||' due on '||loan.enddate);
+    END LOOP;
+END;
+/
+

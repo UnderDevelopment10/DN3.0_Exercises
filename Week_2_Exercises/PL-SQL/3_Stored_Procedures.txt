@@ -1,0 +1,53 @@
+-- Exercise 3: Stored Procedures
+
+-- Scenario 1: The bank needs to process monthly interest for all savings accounts.
+-- o	Question: Write a stored procedure ProcessMonthlyInterest that calculates and updates the balance of all savings accounts by applying an interest rate of 1% to the current balance.
+
+CREATE OR REPLACE PROCEDURE ProcessMonthlyInterest
+IS
+BEGIN
+    UPDATE accounts SET balance = balance * 1.01 WHERE accounttype = 'Savings';
+END;
+/
+
+
+
+-- Scenario 2: The bank wants to implement a bonus scheme for employees based on their performance.
+-- o	Question: Write a stored procedure UpdateEmployeeBonus that updates the salary of employees in a given department by adding a bonus percentage passed as a parameter.
+
+CREATE OR REPLACE PROCEDURE UpdateEmployeeBonus(bonus_percent NUMBER, dept VARCHAR2)
+IS
+BEGIN
+    UPDATE employees SET salary = salary * (1 + (bonus_percent/100)) WHERE department = dept;
+END;
+/
+
+
+
+-- Scenario 3: Customers should be able to transfer funds between their accounts.
+-- o	Question: Write a stored procedure TransferFunds that transfers a specified amount from one account to another, checking that the source account has sufficient balance before making the transfer.
+
+CREATE OR REPLACE PROCEDURE TransferFunds(acc1 NUMBER, acc2 NUMBER, amt NUMBER)
+IS
+    amt_insufficient EXCEPTION;
+    bal NUMBER;
+BEGIN
+    SELECT balance INTO bal
+    FROM accounts
+    WHERE accountid = acc1;
+    IF bal < amt THEN
+        RAISE amt_insufficient;
+    ELSE 
+        UPDATE accounts SET balance = balance + amt 
+        WHERE accountid = acc2;
+        UPDATE accounts SET balance = balance - amt 
+        WHERE accountid = acc1;
+    END IF;
+
+EXCEPTION
+    WHEN amt_insufficient THEN
+        DBMS_OUTPUT.PUT_LINE('Account does not have enough balance.');
+END;
+/
+
+
