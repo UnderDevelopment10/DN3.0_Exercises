@@ -1,0 +1,5 @@
+package com.code.employee.entity;
+
+public class Employee {
+
+}

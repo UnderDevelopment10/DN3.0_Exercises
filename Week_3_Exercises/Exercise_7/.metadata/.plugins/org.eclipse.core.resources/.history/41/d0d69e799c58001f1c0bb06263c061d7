@@ -1,0 +1,5 @@
+package com.code.employee.audit;
+
+public class AuditorAwareImpl {
+
+}

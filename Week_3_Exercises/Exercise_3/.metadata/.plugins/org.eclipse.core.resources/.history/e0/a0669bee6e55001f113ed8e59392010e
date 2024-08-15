@@ -1,0 +1,5 @@
+package com.code.employee.repository;
+
+public interface EmployeeRepository {
+
+}

@@ -1,0 +1,5 @@
+package com.code.employee.config;
+
+public class JpaConfig {
+
+}

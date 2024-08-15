@@ -1,0 +1,7 @@
+package com.code.employee.controllers;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public class DepartmentController extends JpaRepository{
+	
+}
